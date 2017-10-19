@@ -294,7 +294,7 @@ void writeDetection(Mat frame, int frame_number, Mat annotationData, vector<Stri
 		{
 			rectangle(frame, r, Scalar(0, 0, 0), CV_FILLED);
 			putText(frame, folders[i], Point(10, 20+y), FONT_HERSHEY_COMPLEX, 0.5f, Scalar(255, 255, 255));
-			count++;
+			if(folders[i] == "smile" || folders[i] == "brows_r") count++;
 		}
 		y += offset;
 
@@ -519,6 +519,12 @@ Mat composeDetectionFile(vector<String> folders, string file_name, int frame_cou
 		Mat data = readCSV(file, false);
 		if (data.empty())
 		{
+			cout << "Detection file of variable " << folders[i] << " was not found. " << endl;
+			continue;
+		}
+		if (data.rows != frame_count)
+		{
+			cout << "Number of rows in the detection file of variable " << folders[i] << " does not coincide. " << endl;
 			continue;
 		}
 		else

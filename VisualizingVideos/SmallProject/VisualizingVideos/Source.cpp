@@ -7,7 +7,7 @@ using namespace std;
 using namespace cv;
 
 Mat marks;
-vector<String> folders{"smile", "brows_r"};
+vector<String> folders{"smile", "brows_r","concern"};
 void main()
 {
 
