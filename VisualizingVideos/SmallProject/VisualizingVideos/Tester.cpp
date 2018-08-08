@@ -70,7 +70,7 @@ bool Tester::test_file_conf_lvl(string file_name)
 
 	}
 
-	//Check if the frames
+	//Check if the frames surpasses the confidence level
 	if ((float)sum / (float)thresh.rows > PER_CONF_LVL)
 	{
 		return true;
@@ -95,10 +95,12 @@ void Tester::test_shape_std()
 	}
 }
 
+//Returns "true" if the file passed the shape test
 bool Tester::test_file_shape_std(string file_name)
 {
 	//Load distances to the nose
 	Mat data = readCSV(OUTPUT_FILES + string("//dist/") + file_name + string(".csv"));
+	
 	//Load facial action units
 	Mat dataAU = readCSV(OUTPUT_FILES + string("//txt/") + file_name + string(".txt"));
 	if (data.empty())

@@ -47,7 +47,7 @@ void showMarks(Mat frame, int i, Mat markData)
 	if (markData.at<float>(i, 2) == 1)
 	{
 		rectangle(frame, Rect(50, 50+20, 150, 25), Scalar(0, 0, 0), CV_FILLED);
-		putText(frame, "ORIENTATION FLIP", Point(50, 90), FONT_HERSHEY_COMPLEX, 0.5f, Scalar(0, 255, 0));
+		putText(frame, "CHIN SQUISH", Point(50, 90), FONT_HERSHEY_COMPLEX, 0.5f, Scalar(0, 255, 0));
 	}
 
 	if (markData.at<float>(i, 3) == 1)

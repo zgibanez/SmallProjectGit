@@ -19,12 +19,14 @@
 #define SIZE_W_POS_ORI Size(400,250)
 
 //Paths
-//#define OUTPUT_FILES "D://SmallProject//VideosOutput"
-#define OUTPUT_FILES "D://SmallProject//videos_ent_con"
+#define OUTPUT_FILES "D://SmallProject//VideosOutput"
+//#define OUTPUT_FILES "D://SmallProject//videos_ent_con"
 #define TXTFILES     "D://SmallProject//txt_all"
 #define ANNOTATIONS_FOLDER "D://SmallProject//VideosOutput//annotations//"
 #define OUTPUT_FILES_TEST "D://SmallProject//videos_ent_con"
 #define DETECTION_FOLDER "D://SmallProject//VideosOutput//detections"
+#define TRANS_ROT_FOLDER "D://SmallProject//VideosOutput//tr_rot"
+
 
 //Math constants
 #define PI 3.1416
@@ -104,11 +106,11 @@
 #define AU45_c 390
 
 //Added features
-#define AU01_AU02 391
-#define EYEL_DIST 392
-#define EYER_DIST 393
-#define EYEL_ANGL 394
-#define EYER_ANGL 395
+#define AU01_AU02 395
+#define EYEL_DIST 391
+#define EYER_DIST 392
+#define EYEL_ANGL 393
+#define EYER_ANGL 394
 
 //Display functions
 #define MAX_SHAPE_STD 15.0 //Maximum std shape
@@ -125,8 +127,8 @@ cv::Mat readCSV(std::string txtfile, bool header = true);
 std::vector<cv::String> sreadCSV(std::string txtfile);
 void writeCSV(cv::Mat markData, cv::String name);
 void writeCSV(std::vector<cv::String> names, cv::String name);
-
 cv::Mat composeDetectionFile(std::vector<cv::String> folders, std::string file_name, int frame_count);
+void writeTransRot(std::string file_name, cv::Mat data);
 
 // Calculations
 cv::Mat CalcDist(std::vector<cv::String> txtNames);

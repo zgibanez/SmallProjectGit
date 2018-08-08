@@ -7,12 +7,12 @@ using namespace std;
 using namespace cv;
 
 Mat marks;
-vector<String> folders{"smile", "brows_r","concern"};
+vector<String> folders{"concern", "enthusiasm"};
 void main()
 {
 
 	//Retrieve list of files
-	vector<String> fileNames, fileList;
+	vector<String> fileList;
 	bool use_filtered_videos = false;
 
 	//Use filtered videos with Tester
@@ -32,7 +32,7 @@ void main()
 	marks = readCSV(OUTPUT_FILES + string("/markedVideos.csv"), false);
 
 	//Tester functions
-		//vector<String> files = get_files(txtNames);
+		//vector<String> files = get_files(fileList);
 		//Tester tester = Tester();
 		//tester.all_files = files;
 		//tester.initialize();
@@ -75,6 +75,27 @@ void main()
 	vector<string> opened_files;	// Files in which data has been annotated during the program execution
 	string annotation_file;			// Name of the current annotating file
 	Annotator annotator;
+
+	////Writing translation movements and rotation movements
+	//for (int i = 0; fileList.size(); i++)
+	//{
+	//	txtPath = OUTPUT_FILES + string("//txt//") + fileList[i] + ".txt";
+	//	Mat dataCSV = readCSV(txtPath);
+	//	writeTransRot(fileList[i], dataCSV);
+	//	cout << fileList.size() - i << " files left." << endl;
+	//}
+
+	////Writing distances to nose
+	//for (int i = 0; i<fileList.size(); i++)
+	//{
+	//	cout << "Calculating distances to nose of file " << fileList[i] << endl;
+	//	txtPath = OUTPUT_FILES + string("//txt//") + fileList[i] + ".txt";
+	//	Mat dataCSV = readCSV(txtPath);
+	//	get_video_distances(dataCSV, true, fileList[i]);
+	//	cout << fileList.size() - i << " files left." << endl;
+	//}
+
+
 	int frame1 = 0, frame2 = 0;
 	bool frame1_selected = false;
 
@@ -138,22 +159,25 @@ void main()
 
 			///CALCULATIONS
 			//CALC STD
-				//CalcStdLandmark(frame_count, dataCSV);
+				CalcStdLandmark(frame_count, dataCSV);
 			//CALC ROTATION
-				//get_dist_to_nose(dataCSV, frame_count);
+				get_dist_to_nose(dataCSV, frame_count);
 			///END CALCULATIONS 
 
 			//Display AU, Position/Orientation and distance
 			writeAU(AUC, frame_count, dataCSV);						imshow("AUC", AUC);
 			writePosOri(posAndOri, frame_count, dataCSV);			imshow("posAndOri", posAndOri);
-			//writeDist(DIST, frame_count, dataDistCSV, i, marks);	imshow("Std", DIST);
+			writeDist(DIST, frame_count, dataDistCSV, i, marks);	imshow("Std", DIST);
 			writeEyeDist(DIST, frame_count, dataCSV, frame);				imshow("Eye distances", DIST);
 			//writeDetection(frame, frame_count, dataDetcCSV, "SMILE");
 			writeDetection(frame, frame_count, dataDetc, folders);
 
 
 			//Display confidence interval and speed
+			Rect r = Rect(5, 35, 200, 30);
+			rectangle(frame, r, Scalar(0, 0, 0), CV_FILLED);
 			putText(frame, "Confidence: " + to_string(dataCSV.at<float>(frame_count, 2)), Point(10, 50), FONT_HERSHEY_COMPLEX, 0.5f, Scalar(255, 255, 255));
+			putText(frame, "Frame: " + to_string(frame_count), Point(5, 30), FONT_HERSHEY_COMPLEX, 0.5f, Scalar(255, 255, 255));
 			if (!paused) putText(frame, "Speed: " + to_string(frameRate), Point(10, frame.rows - 10), FONT_HERSHEY_COMPLEX, 0.5f, Scalar(255, 0, 0));
 			if (frame1_selected)
 			{

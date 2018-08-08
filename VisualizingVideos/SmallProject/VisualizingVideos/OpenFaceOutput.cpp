@@ -191,23 +191,29 @@ void writeDist(Mat frame, int current_frame, Mat data, int index, Mat marks)
 
 	Scalar color;
 
-	if (data.at<float>(current_frame, 3) > MAX_SHAPE_STD) color = Scalar(0, 0, 255);
+	if (data.at<float>(current_frame, 30) > MAX_SHAPE_STD) color = Scalar(0, 0, 255);
 	else color = Scalar(0, 255, 0);
-	putText(frame, "Righ dist: " + rndup_str(data.at<float>(current_frame, 3), 2), Point(90, y), FONT_HERSHEY_COMPLEX, 0.5f, color);
+	putText(frame, "Right cheek STD: " + rndup_str(data.at<float>(current_frame, 30), 2), Point(90, y), FONT_HERSHEY_COMPLEX, 0.5f, color);
 	y += y_step;
 
-	if (data.at<float>(current_frame, 4) > MAX_SHAPE_STD) color = Scalar(0, 0, 255);
+	if (data.at<float>(current_frame, 31) > MAX_SHAPE_STD) color = Scalar(0, 0, 255);
 	else color = Scalar(0, 255, 0);
-	putText(frame, "Left dist: " + rndup_str(data.at<float>(current_frame, 4), 2), Point(90, y), FONT_HERSHEY_COMPLEX, 0.5f, color);
+	putText(frame, "Left cheek STD: " + rndup_str(data.at<float>(current_frame, 31), 2), Point(90, y), FONT_HERSHEY_COMPLEX, 0.5f, color);
 	y += y_step;
 
-	if (data.at<float>(current_frame, 5) > MAX_CHIN_STD) color = Scalar(0, 0, 255);
+	if (data.at<float>(current_frame, 32) > MAX_CHIN_STD) color = Scalar(0, 0, 255);
 	else color = Scalar(0, 255, 0);
-	putText(frame, "Chin dist: " + rndup_str(data.at<float>(current_frame, 5), 2), Point(90, y), FONT_HERSHEY_COMPLEX, 0.5f, color);
+	putText(frame, "Chin STD: " + rndup_str(data.at<float>(current_frame, 32), 2), Point(90, y), FONT_HERSHEY_COMPLEX, 0.5f, color);
 	y += y_step;
 
+	if (data.at<float>(current_frame, 33) > MAX_CHIN_STD) color = Scalar(0, 0, 255);
+	else color = Scalar(0, 255, 0);
+	putText(frame, "Brows STD: " + rndup_str(data.at<float>(current_frame, 33), 2), Point(90, y), FONT_HERSHEY_COMPLEX, 0.5f, color);
+	y += y_step;
 
-
+	color = Scalar(0, 0, 255);
+	if(marks.at<float>(index,0) >= 1)
+		putText(frame, "VIDEO REJECTED ", Point(90, y), FONT_HERSHEY_COMPLEX, 0.5f, color);
 }
 
 void writeDetection(Mat frame, int frame_number, Mat annotationFile, String message)
@@ -441,10 +447,10 @@ vector<String> sreadCSV(string csvfile)
 
 }
 
-void writeCSV(Mat markData, String name)
+void writeCSV(Mat markData, String path)
 {
 	fstream outputFile;
-	outputFile.open(name, std::ios::out);
+	outputFile.open(path, std::ios::out);
 	//cout << " WRITING ROWS " << markData.rows << " COLS " << markData.cols << endl;
 
 	for (int i = 0; i<markData.rows; i++)
@@ -683,9 +689,20 @@ Mat get_dist_to_nose(Mat data, int frame)
 	Mat p31 = (Mat_<float>(4, 1) << data.at<float>(frame, X_0 + 30), data.at<float>(frame, Y_0 + 30), data.at<float>(frame, Z_0 + 30), 1);
 
 	//Chin
+	Mat p8 = (Mat_<float>(4, 1) << data.at<float>(frame, X_0 + 7), data.at<float>(frame, Y_0 + 7), data.at<float>(frame, Z_0 + 7), 1);
 	Mat p9 = (Mat_<float>(4, 1) << data.at<float>(frame, X_0 + 8), data.at<float>(frame, Y_0 + 8), data.at<float>(frame, Z_0 + 8), 1);
+	Mat p10 = (Mat_<float>(4, 1) << data.at<float>(frame, X_0 + 9), data.at<float>(frame, Y_0 + 9), data.at<float>(frame, Z_0 + 9), 1);
 
+	//Right
+	Mat p18 = (Mat_<float>(4, 1) << data.at<float>(frame, X_0 + 17), data.at<float>(frame, Y_0 + 17), data.at<float>(frame, Z_0 + 18), 1);
+	Mat p22 = (Mat_<float>(4, 1) << data.at<float>(frame, X_0 + 21), data.at<float>(frame, Y_0 + 21), data.at<float>(frame, Z_0 + 21), 1);
+	
+	//Left eyebrow
+	Mat p23 = (Mat_<float>(4, 1) << data.at<float>(frame, X_0 + 22), data.at<float>(frame, Y_0 + 22), data.at<float>(frame, Z_0 + 22), 1);
+	Mat p27 = (Mat_<float>(4, 1) << data.at<float>(frame, X_0 + 26), data.at<float>(frame, Y_0 + 26), data.at<float>(frame, Z_0 + 26), 1);
+	
 	//Translate their coordinates to moving frame
+
 	Mat p1R = R*p1;
 	Mat p2R = R*p2;
 	Mat p3R = R*p3;
@@ -702,7 +719,15 @@ Mat get_dist_to_nose(Mat data, int frame)
 
 	Mat p34R = R*p34;
 	Mat p31R = R * p31;
+
+	Mat p8R = R * p8;
 	Mat p9R = R * p9;
+	Mat p10R = R * p10;
+
+	Mat p18R = R*p18;
+	Mat p22R = R*p22;
+	Mat p23R = R*p23;
+	Mat p27R = R*p27;
 
 	//Calculate distances
 	//float dist_xR = abs(p3R.at<float>(0, 0) - p34R.at<float>(0, 0))+ abs(p4R.at<float>(0, 0) - p34R.at<float>(0, 0)) + abs(p5R.at<float>(0, 0) - p34R.at<float>(0, 0));
@@ -711,13 +736,38 @@ Mat get_dist_to_nose(Mat data, int frame)
 	float dist_xL = abs(p17R.at<float>(0, 0) - p31R.at<float>(0, 0)) + abs(p16R.at<float>(0, 0) - p31R.at<float>(0, 0)) + abs(p15R.at<float>(0, 0) - p31R.at<float>(0, 0));
 
 	float dist_y = abs(p9R.at<float>(1, 0) - p34R.at<float>(1, 0));
+
 	//cout << p3R.at<float>(0, 0) << " " << p34R.at<float>(0, 0) << " " << p15R.at<float>(0, 0) << endl;
 	//cout << "DIST1 " << dist1 << " DIST2 " << dist2 << endl;
 	//cout << "DIST1: " << dist_xR << " DIST2: " << dist_xL << endl;
 	//cout << "Dist chin2nose: " << dist_y << endl;
 
-	Mat distance = (Mat_<float>(1, 3) << dist_xR, dist_xL, dist_y);
+	//Mat distance = (Mat_<float>(1, 3) << dist_xR, dist_xL, dist_y);
 
+	//Calculate distances
+	float d3x = abs(p3R.at<float>(0, 0) - p31R.at<float>(0, 0));
+	float d4x = abs(p4R.at<float>(0, 0) - p31R.at<float>(0, 0));
+	float d5x = abs(p5R.at<float>(0, 0) - p31R.at<float>(0, 0));
+	float d6x = abs(p6R.at<float>(0, 0) - p31R.at<float>(0, 0));
+
+	float d15x = abs(p15R.at<float>(0, 0) - p31R.at<float>(0, 0));
+	float d14x = abs(p14R.at<float>(0, 0) - p31R.at<float>(0, 0));
+	float d13x = abs(p13R.at<float>(0, 0) - p31R.at<float>(0, 0));
+	float d12x = abs(p12R.at<float>(0, 0) - p31R.at<float>(0, 0));
+
+	//
+	float d8y = abs(p8R.at<float>(1, 0) - p34R.at<float>(1, 0));
+	float d9y = abs(p9R.at<float>(1, 0) - p34R.at<float>(1, 0));
+	float d10y = abs(p10R.at<float>(1, 0) - p34R.at<float>(1, 0));
+
+	//
+	float d18y = abs(p18R.at<float>(1, 0) - p34R.at<float>(1, 0));
+	float d22y = abs(p22R.at<float>(1, 0) - p34R.at<float>(1, 0));
+	float d23y = abs(p23R.at<float>(1, 0) - p34R.at<float>(1, 0));
+	float d27y = abs(p27R.at<float>(1, 0) - p34R.at<float>(1, 0));
+
+
+	Mat distance = (Mat_<float>(1, 15) << d3x, d4x, d5x, d6x, d15x, d14x, d13x, d12x, d8y, d9y, d10y, d18y, d22y, d23y, d27y);
 	return distance;
 }
 
@@ -725,7 +775,7 @@ Mat get_dist_to_nose(Mat data, int frame)
 Mat calc_std_distances(Mat distances, int neighbours = 5)
 {
 
-	int offset = neighbours*2;
+	int offset = neighbours*4;
 
 	//Fill the first frames with zeros so that the initial frames are not considered
 	Mat stds = Mat::zeros(Size(distances.cols, distances.rows), CV_32F);
@@ -734,6 +784,7 @@ Mat calc_std_distances(Mat distances, int neighbours = 5)
 	{
 		for (int i = offset; i < distances.rows - offset; i++)
 		{
+			//Crop the neighbourhood around the point
 			Mat cropped = distances(Rect(j, i - neighbours, 1, neighbours * 2));
 			Mat stdValue, stdValueF;
 			meanStdDev(cropped, Mat(), stdValue);
@@ -756,7 +807,7 @@ Mat calc_std_distances(Mat distances, int neighbours = 5)
 void get_video_distances(Mat data, bool write, String file_name)
 {
 	//1: Calculate the distances to the nose
-	Mat distances = Mat::zeros(Size(3,0),CV_32F);
+	Mat distances = Mat::zeros(Size(15,0),CV_32F);
 	for (int i = 0; i < data.rows; i++)
 	{
 		distances.push_back(get_dist_to_nose(data,i).row(0));
@@ -769,9 +820,22 @@ void get_video_distances(Mat data, bool write, String file_name)
 	if (write)
 	{
 		String path = OUTPUT_FILES;
-		path += "/dist/" + get_file_name(file_name) + ".csv";
+		path += "/dist/" + file_name + ".csv";
 		//cout << path << endl;
 		writeCSV(dist_std, path);
 	}
 }
 
+//Gets video translations and orientation between consecutive frames
+void writeTransRot(string file_name, Mat data)
+{
+	Mat trans_rot = Mat::zeros(Size(3, data.rows), CV_32F);
+	for (int i = 0; i < data.rows; i++)
+	{
+		trans_rot.at<float>(i, 0) = i;
+		trans_rot.at<float>(i, 1) = ang2rot(i, data);
+		trans_rot.at<float>(i, 2) = calc_translation(i, data);
+	}
+	writeCSV(trans_rot, TRANS_ROT_FOLDER + string("//") + file_name + ".csv");
+	cout << "File " << file_name << " written  in " << TRANS_ROT_FOLDER + string("//") + file_name  + ".csv" << endl;
+}
